@@ -2,21 +2,32 @@ import React from "react";
 
 import "./ChampionCard.css";
 
+const TRAIT_COLORS = {
+  1: "rgb(22, 37, 50)",
+  2: "rgb(17, 54, 43)",
+  3: "rgb(37, 70, 92)",
+  4: "rgb(128, 10, 102)",
+  5: "rgb(160, 109, 16)",
+};
+
 function ChampionCard({ id, name, traits, cost, img, onClick }) {
+  const traitColor = TRAIT_COLORS[cost];
   return (
     <div className="card" onClick={() => onClick(id)} style={{ backgroundImage: `url("${img}")` }}>
-      <img
-        className="card-cost-img"
-        src="//fastcdn.mobalytics.gg/stable/tft/rarity/cost-4.png"
-        alt="Champion cost 4"
-      />
-      <div className="card-body">
+      {cost > 1 && (
+        <img
+          className="card-cost-img"
+          src={`//fastcdn.mobalytics.gg/stable/tft/rarity/cost-${cost}.png`}
+          alt="Champion cost border"
+        />
+      )}
+      <div className="card-body" style={{ border: `5px solid ${traitColor}` }}>
         <div>
           {traits.map((trait) => (
             <div key={trait.name}>
               <div className="card-trait">
                 <div className="card-trait-img-wrapper">
-                  <img className="card-trait-img" src={trait.img} alt="cultist" />
+                  <img className="card-trait-img" src={trait.img} alt={trait.name} />
                 </div>
                 {trait.name}
               </div>
@@ -24,7 +35,7 @@ function ChampionCard({ id, name, traits, cost, img, onClick }) {
           ))}
         </div>
       </div>
-      <div className="card-name-wrapper">
+      <div className="card-name-wrapper" style={{ backgroundColor: traitColor }}>
         <span className="card-name-text">{name}</span>
         <div className="cost-wrapper">
           <svg className="gold-icon" width="21px" height="14px" viewBox="0 0 21 14" version="1.1">
