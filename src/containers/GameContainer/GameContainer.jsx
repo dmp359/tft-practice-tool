@@ -6,6 +6,7 @@ import useKeyPress from 'helpers/helpers';
 import "./GameContainer.css";
 
 
+
 const createUnit = ({ championId, cost, traits, name, imgName }) => ({
   id: championId,
   cost,
@@ -37,9 +38,9 @@ const generateNRandom = (num, level = null) => {
 
 
 // Generate array of all possible champions in the set
-const generateWholeSet = () => {
-  return champions.map(createUnit).filter((c) => c.id !== "TFT_TrainingDummy"); // Remove training dummy
-};
+// const generateWholeSet = () => {
+//   return champions.map(createUnit).filter((c) => c.id !== "TFT_TrainingDummy"); // Remove training dummy
+// };
 
 
 /**
