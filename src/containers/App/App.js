@@ -10,7 +10,7 @@ function App() {
       <header className="App-header">
         {!start && (
           <button className="Begin-button" onClick={() => setStart(true)}>
-            Begin (Set 4)
+            Begin
           </button>
         )}
         {start && <GameContainer />}

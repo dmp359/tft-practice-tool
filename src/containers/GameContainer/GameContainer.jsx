@@ -1,12 +1,60 @@
 import React, { useState } from "react";
 import ChampionCard from "components/ChampionCard";
 import champions from "data/set4update/champions.json";
+import useKeyPress from 'helpers/helpers';
+
 import "./GameContainer.css";
+
+
+const createUnit = ({ championId, cost, traits, name, imgName }) => ({
+  id: championId,
+  cost,
+  img: `https://fastcdn.mobalytics.gg/assets/tft/images/champions/thumbnail/set4-5/${
+    imgName ? imgName : name.toLowerCase() // Hyphenated two-word champ names are hardcoded into champions.json's imgName
+  }.jpg`,
+  traits: traits.map((traitStr) => {
+    const cleanedTraitName = traitStr.replace("Set4_", ""); // Set4_Mage => Mage
+    return {
+      name: cleanedTraitName,
+      img: traitStr === 'Boss' ?  `https://fastcdn.mobalytics.gg/assets/tft/images/synergies/set4-5/the-${cleanedTraitName.toLowerCase()}-gold.svg` :
+       `https://fastcdn.mobalytics.gg/assets/tft/images/synergies/set4-5/${cleanedTraitName.toLowerCase()}-white.svg`,
+    };
+  }),
+  name,
+});
+
+// Generate N random units, i.e. 5
+// Use roll odds if "level" is specified
+const generateNRandom = (num, level = null) => {
+  let units = []
+  for (let i = 0; i < num; i += 1) {
+    const randomUnitIndex = Math.floor(Math.random() * (champions.length - 1));
+    const randomUnit = champions[randomUnitIndex];
+    units.push(createUnit(randomUnit));
+  }
+  return units;
+}
+
+
+// Generate array of all possible champions in the set
+const generateWholeSet = () => {
+  return champions.map(createUnit).filter((c) => c.id !== "TFT_TrainingDummy"); // Remove training dummy
+};
+
 
 /**
  * Handle game state
  */
 function GameContainer() {
+  const fetch = () => {
+    return generateNRandom(5);
+  }
+  const [cards, setCards] = useState(fetch());
+  const onReroll = () => {
+    setCards(fetch())
+  };
+  useKeyPress("d", onReroll);
+
   // Sample data
   // const aatrox = {
   //   id: 1,
@@ -25,36 +73,6 @@ function GameContainer() {
   //   cost: 1,
   // };
 
-  // Generate array of all possible champions in the set
-  const generateWholeSet = () => {
-    return champions
-      .map(({ championId, cost, traits, name, imgName }) => ({
-        id: championId,
-        cost,
-        img: `https://fastcdn.mobalytics.gg/assets/tft/images/champions/thumbnail/set4-5/${
-          imgName ? imgName : name.toLowerCase() // Hyphenated two-word champ names are hardcoded into champions.json's imgName
-        }.jpg`,
-        traits: traits.map((traitStr) => {
-          const cleanedTraitName = traitStr.replace("Set4_", ""); // Set4_Mage => Mage
-          return {
-            name: cleanedTraitName,
-            img: `https://fastcdn.mobalytics.gg/assets/tft/images/synergies/set4-5/${cleanedTraitName.toLowerCase()}-white.svg`,
-          };
-        }),
-        name,
-      }))
-      .filter((c) => c.id !== "TFT_TrainingDummy"); // Remove training dummy
-  };
-
-  const [cards, setCards] = useState(generateWholeSet());
-  // const [cards, setCards] = useState([
-  //   aatrox,
-  //   { ...aatrox, id: 2, cost: 2 },
-  //   { ...aatrox, id: 3, cost: 3 },
-  //   { ...aatrox, id: 4, cost: 4 },
-  //   { ...aatrox, id: 5, cost: 5 },
-  // ]);
-
   // Callback for on click of card
   const onCardClick = (id) => {
     // For now, just delete the card from the state
@@ -65,9 +83,9 @@ function GameContainer() {
     <>
       <div className="container">
         <div className="grid">
-          {cards.map(({ id, name, traits, img, cost }) => (
+          {cards.map(({ id, name, traits, img, cost }, i) => (
             <ChampionCard
-              key={id}
+              key={`${id}-${i}`}
               onClick={onCardClick}
               id={id}
               name={name}
